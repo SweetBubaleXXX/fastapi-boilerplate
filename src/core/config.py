@@ -18,6 +18,3 @@ class Settings(BaseSettings):
         env_file=(".env", ".env.prod"),
         extra="ignore",
     )
-
-
-settings = Settings()
