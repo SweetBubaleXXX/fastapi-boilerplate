@@ -15,6 +15,6 @@ def create_app() -> FastAPI:
         version=settings.API_VERSION,
     )
 
-    app.include_router(v1_router, prefix=settings.API_V1_STR)
+    app.include_router(v1_router, prefix=settings.API_V1_PREFIX)
 
     return app

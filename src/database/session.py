@@ -9,9 +9,9 @@ from ..core.container import Container
 
 @inject
 def get_session_factory(
-    session_factory: async_sessionmaker[AsyncSession] = Provide[
-        Container.db_session_factory
-    ],
+    session_factory: async_sessionmaker[AsyncSession] = Depends(
+        Provide[Container.db_session_factory]
+    ),
 ):
     return session_factory
 
