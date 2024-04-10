@@ -27,6 +27,8 @@ COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY ./deploy/gunicorn.conf.py ./alembic.ini ./
 
+COPY ./alembic ./alembic
+
 COPY ./src ./src
 
 CMD [ "gunicorn", "-c", "gunicorn.conf.py", "src.main:create_app()" ]
