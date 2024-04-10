@@ -4,7 +4,7 @@ from asgi_lifespan import LifespanManager
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.pool import NullPool
+from sqlalchemy.pool import StaticPool
 
 from src import main
 from src.core.config import Settings
@@ -25,12 +25,16 @@ def settings(container: Container):
 
 @pytest.fixture(scope="session", autouse=True)
 def override_db_engine(settings: Settings, container: Container):
-    engine = create_async_engine(settings.TEST_DB_URL, poolclass=NullPool)
+    engine = create_async_engine(
+        settings.TEST_DB_URL,
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     with container.db_engine.override(engine):
         yield
 
 
-@pytest_asyncio.fixture(autouse=True)
+@pytest_asyncio.fixture
 async def setup_database(container: Container):
     engine = container.db_engine()
     async with engine.begin() as conn:
@@ -42,6 +46,7 @@ async def setup_database(container: Container):
         await conn.run_sync(Base.metadata.drop_all)
 
 
+@pytest.mark.usefixtures("setup_database")
 @pytest_asyncio.fixture
 async def db_session(container: Container):
     session_generator = get_session(container.db_session_factory())
